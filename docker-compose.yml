@@ -1,0 +1,34 @@
+# Initiate RS
+# sudo docker-compose exec mongo1 mongo --eval 'rs.initiate({_id: "rs0", members:[{_id: 0, host: "mongo1:27017"},{_id: 1, host: "mongo2:27017"},{_id: 2, host: "mongo3:27017", arbiterOnly: true }]})'
+# sudo docker-compose exec mongodest mongo --eval 'rs.initiate({_id: "dest-rs", members:[{_id: 0, host: "mongodest:27017"}]})'
+version: "3"
+services:
+  # Source replica set
+  mongo1:
+    image: mongo
+    networks: ["db"]
+    ports: ["27017:27017"]
+    tmpfs: ["/data"]
+    command: ["mongod", "--bind_ip_all", "--replSet=rs0"]
+  mongo2:
+    image: mongo
+    networks: ["db"]
+    ports: ["27018:27017"]
+    tmpfs: ["/data"]
+    command: ["mongod", "--bind_ip_all", "--replSet=rs0"]
+  mongo3:
+    image: mongo
+    networks: ["db"]
+    ports: ["27019:27017"]
+    tmpfs: ["/data"]
+    command: ["mongod", "--bind_ip_all", "--replSet=rs0"]
+  # Clone RS
+  mongodest:
+    image: mongo
+    networks: ["db"]
+    ports: ["27020:27017"]
+    tmpfs: ["/data"]
+    command: ["mongod", "--bind_ip_all", "--replSet=dest-rs"]
+
+networks:
+  db: {}
